@@ -1,0 +1,43 @@
+name:               lgtk-plot-demo
+version:            0.1
+category:           GUI
+synopsis:           Lens GUI Toolkit Plot Demo
+description:
+    LGtk Plot Demo is a demo app for LGtk plotting a simple function.
+stability:          experimental
+license:            BSD3
+license-file:       LICENSE
+author:             Pék Dániel
+homepage:           http://blog.pdani.org
+maintainer:         pekdaniel@gmail.com
+cabal-version:      >= 1.8
+build-type:         Simple
+extra-source-files: changelog
+
+source-repository head
+  type:             git
+  location:         https://github.com/pdani/lgtk-plot-demo.git
+
+
+executable lgtk-plot-demo
+  build-depends:
+                    base < 5
+                  , lgtk
+
+                  , diagrams-lib < 1.2
+                  , containers
+
+  main-is:
+                    Main.hs
+
+  hs-source-dirs:
+                    src
+  ghc-options:
+                    -threaded
+                    -Wall 
+                    -fno-warn-incomplete-patterns 
+                    -fno-warn-name-shadowing 
+                    -fno-warn-missing-signatures 
+                    -fno-warn-orphans
+                    -fno-warn-type-defaults
+
