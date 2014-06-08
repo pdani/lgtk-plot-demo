@@ -18,18 +18,6 @@ source-repository head
   type:             git
   location:         https://github.com/pdani/lgtk-plot-demo.git
 
-library
-  build-depends:
-                    base < 5
-                  , attoparsec
-                  , bytestring
-
-  hs-source-dirs:
-                    src
-
-  exposed-modules:
-                    Data.Attoparsec.Expression
-
 executable lgtk-plot-demo
   build-depends:
                     base < 5
@@ -40,6 +28,7 @@ executable lgtk-plot-demo
                   , diagrams-lib < 1.2
                   , containers
                   , attoparsec
+                  , attoparsec-expression
 
   main-is:
                     Main.hs

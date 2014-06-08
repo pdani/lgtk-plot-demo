@@ -31,13 +31,13 @@ mainWidget = notebook
                     [ entry equation
                     , label $ readRef errorMsg
                     , hcat
-                        [ -- label $ pure "X axis range: "
-                         entry rangeXmin
+                        [ label $ return "X axis range: "
+                        , entry rangeXmin
                         , entry rangeXmax
                         ]
                     , hcat
-                        [ -- label $ pure "Y axis range: "
-                         entry rangeYmin
+                        [ label $ return "Y axis range: "
+                        , entry rangeYmin
                         , entry rangeYmax
                         ]
                     ]
