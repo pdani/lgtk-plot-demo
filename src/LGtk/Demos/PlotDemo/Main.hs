@@ -9,7 +9,6 @@ import Diagrams.Prelude hiding (vcat, hcat)
 import Diagrams.TwoD.Shapes (hrule, vrule)
 
 import LGtk
-import Data.ByteString.Char8 as BS hiding (map)
 import LGtk.Demos.PlotDemo.ArithParser (parseArith)
 
 main :: IO ()
@@ -20,6 +19,10 @@ mainWidget = notebook
 
         [ (,) "Function" $ do
             equation <- newRef "x * x - 5"
+            rangeXmin <- newRef "-10.0"
+            rangeXmax <- newRef "10.0"
+            rangeYmin <- newRef "-10.0"
+            rangeYmax <- newRef "10.0"
             errorMsg <- newRef "No error"
             hcat
                 [ canvas 200 200 20 (const $ return ()) Nothing (readRef equation) $
@@ -27,6 +30,16 @@ mainWidget = notebook
                 , vcat
                     [ entry equation
                     , label $ readRef errorMsg
+                    , hcat
+                        [ -- label $ pure "X axis range: "
+                         entry rangeXmin
+                        , entry rangeXmax
+                        ]
+                    , hcat
+                        [ -- label $ pure "Y axis range: "
+                         entry rangeYmin
+                        , entry rangeYmax
+                        ]
                     ]
                 ]
         ]
