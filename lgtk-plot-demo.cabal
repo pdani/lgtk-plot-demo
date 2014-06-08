@@ -8,7 +8,7 @@ stability:          experimental
 license:            BSD3
 license-file:       LICENSE
 author:             Pék Dániel
-homepage:           http://blog.pdani.org
+homepage:           https://github.com/pdani/lgtk-plot-demo
 maintainer:         pekdaniel@gmail.com
 cabal-version:      >= 1.8
 build-type:         Simple
@@ -35,6 +35,7 @@ executable lgtk-plot-demo
                     base < 5
                   , lgtk
                   , bytestring
+                  , lens
 
                   , diagrams-lib < 1.2
                   , containers
