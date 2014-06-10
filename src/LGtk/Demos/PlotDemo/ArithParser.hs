@@ -1,50 +1,68 @@
+{-# LANGUAGE OverloadedStrings #-}
 module LGtk.Demos.PlotDemo.ArithParser where
 
-import Control.Applicative
 import Data.Attoparsec.ByteString.Char8
-import Data.Attoparsec.Expression
-import Data.ByteString.Char8 hiding (map, empty)
+import Control.Applicative
+import qualified Data.ByteString.Char8 as BS
 
-binary  name fun assoc = Infix (fun <$ string (pack name)) assoc
-prefix  name fun       = Prefix (fun <$ string (pack name))
-postfix name fun       = Postfix (fun <$ string (pack name))
+data Assoc = LeftAssoc | RightAssoc
 
-table = [ [ prefix "-" negate, prefix "+" id ]
-        , [ prefix "abs" abs, prefix "sqrt" sqrt, prefix "log" log
-          , prefix "sin" sin, prefix "tan" tan, prefix "cos" cos
-          , prefix "asin" asin, prefix "atan" atan, prefix "acos" acos
-          , prefix "sinh" sinh, prefix "tanh" tanh, prefix "cosh" cosh
-          , prefix "asinh" asinh, prefix "atanh" atanh, prefix "acosh" acosh
-          , prefix "trunc" (\x -> fromIntegral (truncate x :: Integer))
-          , prefix "round" (\x -> fromIntegral (round x :: Integer))
-          , prefix "ceil" (\x -> fromIntegral (ceiling x :: Integer))
-          , prefix "floor" (\x -> fromIntegral (floor x :: Integer))
-          ]
-          
-        , [ binary "^" (**) AssocRight ]
-        
-        , [ binary "*" (*) AssocLeft, binary "/" (/) AssocLeft ]
-        
-        , [ binary "+" (+) AssocLeft, binary "-" (-) AssocLeft ]
-        ]
+data Op a
+  = PrefixOps [Parser (a -> a)]
+  | InfixOps Assoc [Parser (a -> a -> a)]
 
-symbol :: [(ByteString, Double)] -> Parser Double
+prefix :: BS.ByteString -> (a -> a) -> Parser (a -> a)
+prefix str f = string str *> skipSpace *> return f
+
+infix_ :: BS.ByteString -> (a -> a -> a) -> Parser (a -> a -> a)
+infix_ str f = string str *> skipSpace *> return f
+
+table :: [Op Double]
+table
+  = [ InfixOps LeftAssoc [ infix_ "-" (-), infix_ "+" (+) ]
+    , InfixOps LeftAssoc [ infix_ "*" (*), infix_ "/" (/) ]
+    , PrefixOps [ prefix "-" negate, prefix "+" id ]
+    , InfixOps RightAssoc [infix_ "^" (**)]
+    , PrefixOps [ prefix "abs" abs, prefix "sqrt" sqrt, prefix "log" log
+                , prefix "sin" sin, prefix "tan" tan, prefix "cos" cos
+                , prefix "asin" asin, prefix "atan" atan, prefix "acos" acos
+                , prefix "sinh" sinh, prefix "tanh" tanh, prefix "cosh" cosh
+                , prefix "asinh" asinh, prefix "atanh" atanh, prefix "acosh" acosh
+                , prefix "trunc" (\x -> fromIntegral (truncate x :: Integer))
+                , prefix "round" (\x -> fromIntegral (round x :: Integer))
+                , prefix "ceil" (\x -> fromIntegral (ceiling x :: Integer))
+                , prefix "floor" (\x -> fromIntegral (floor x :: Integer))
+                ]
+
+    ]
+
+symbol :: [(String, Double)] -> Parser Double
 symbol symTab = choice $ map f symTab
-  where f (sym, val) = string sym *> pure val
+  where f (sym, val) = string (BS.pack sym) *> pure val
 
-strip p = skipSpace *> p <* skipSpace
+p :: [Op Double] -> [(String, Double)] -> Parser Double
+p t s = skipSpace *> p' t
 
-parens p = char '(' *> p <* char ')'
+  where
+    p' :: [Op Double] -> Parser Double
+    p' (InfixOps LeftAssoc ps : ops) = do
+      val <- p' ops
+      as <- many (skipSpace *> liftA2 (,) (choice ps) (p' ops))
+      return $ foldr (\(f, a) b -> f b a) val as
 
-term symTab = strip p
-  where p =  parens (expr symTab)
-         <|> double
-         <|> symbol symTab
-         <?> "simple expression"
+    p' (InfixOps RightAssoc ps : ops) = do
+      val <- p' ops
+      as <- many (skipSpace *> liftA2 (,) (choice ps) (p' ops))
+      return $ foldr (\(f, b) g a -> f a (g b)) id as val
 
-expr symTab = strip p
-  where p =  buildExpressionParser table (term symTab)
-         <?> "expression"
+    p' (PrefixOps ps : ops) = do
+      fs <- many (choice ps)
+      val <- p' ops
+      return $ foldl (flip ($)) val fs
+    p' [] = do
+      choice [ char '(' *> skipSpace *> p' t <* skipSpace <* char ')'
+             , symbol s
+             , double
+             ] <* skipSpace
 
-parseArith symTab str = parseOnly (expr $ map f symTab) $ pack str
-  where f (s, v) = (pack s, v)
+parseArith symTab = parseOnly (p table symTab <* endOfInput) . BS.pack
