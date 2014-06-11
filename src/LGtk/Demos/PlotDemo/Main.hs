@@ -18,18 +18,17 @@ mainWidget = notebook
     [ (,) "PDani" $ notebook
 
         [ (,) "Function" $ do
-            equation <- newRef "x * x - 5"
-            rangeXmin <- newRef "-10.0"
-            rangeXmax <- newRef "10.0"
-            rangeYmin <- newRef "-10.0"
-            rangeYmax <- newRef "10.0"
-            errorMsg <- newRef "No error"
+            equation <- newRef "x ^ 2 - 5"
+            rangeXmin <- newRef "-10"
+            rangeXmax <- newRef "10"
+            rangeYmin <- newRef "-10"
+            rangeYmax <- newRef "10"
             hcat
                 [ canvas 200 200 20 (const $ return ()) Nothing (readRef equation) $
-                    \str -> drawGraph (parseFunc str) # value () # lw 0.05
+                    \str -> (snd . drawPlot) str # value () # lw 0.05
                 , vcat
                     [ entry equation
-                    , label $ readRef errorMsg
+                    , label $ liftM (((++) "Parse error: ") . fst . drawPlot) $ readRef equation
                     , hcat
                         [ label $ return "X axis range: "
                         , entry rangeXmin
@@ -45,11 +44,20 @@ mainWidget = notebook
         ]
     ]
 
-drawGraph :: (Double -> Double) -> Dia Any
-drawGraph f = hrule 20.0 <> vrule 20.0
-           <> (fromVertices $ map p2 [(x, f x) | x <- [-10, -9.9..10]]) # lc blue
+drawPlot :: String -> (String, Dia Any)
+drawPlot str = either (flip (,) emptyPlot) ((,) "" . (flip (<>) emptyPlot)) res
+  where res = drawFunc $ parseFunc str
+  
+emptyPlot :: Dia Any
+emptyPlot = hrule 20.0 <> vrule 20.0
 
-parseFunc str x = case res of Left _  -> 0.0
-                              Right x -> x
+drawFunc :: (Double -> Either String Double) -> Either String (Dia Any)
+drawFunc f = do
+    let xs = [-10.0,-9.9..10.0]
+    ys <- mapM f xs
+    let pts = map p2 $ zip xs ys
+    return $ fromVertices pts # lc blue
+
+parseFunc :: String -> Double -> Either String Double
+parseFunc str x = parseArith symTab str
   where symTab = [("pi", pi), ("e", exp 1.0), ("x", x)]
-        res = parseArith symTab str
