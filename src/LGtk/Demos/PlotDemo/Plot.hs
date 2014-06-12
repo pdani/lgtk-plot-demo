@@ -7,11 +7,8 @@ module LGtk.Demos.PlotDemo.Plot
     ) where
 
 import Control.Lens hiding ((#))
-
 import Diagrams.Prelude hiding (trace)
-
 import LGtk (Dia)
-
 import LGtk.Demos.PlotDemo.ArithParser (parseFunc)
 
 type ViewPort = ((Double, Double), (Double, Double))
@@ -36,6 +33,9 @@ $(makeLenses ''PlotState)
 defPlotState :: PlotState
 defPlotState = PlotState "x ^ 2 - 5" defViewPort
 
+funcResolution :: Double
+funcResolution = 1000
+
 drawPlot :: Double -> PlotState -> (String, Dia ())
 drawPlot lWidth (PlotState eq vp) = maybe ("Parse error", (lineSet . emptyPlot) defViewPort) ((,) "" . (lineSet . transPlot . (flip (<>) $ emptyPlot vp))) res
   where res = drawFunc (fst vp) $ parseFunc eq
@@ -49,7 +49,8 @@ emptyPlot vp = hrule xsize <> vrule ysize
 
 drawFunc :: (Double, Double) -> (Double -> Maybe Double) -> Maybe (Dia Any)
 drawFunc (xmin, xmax) f = do
-    let xs = [xmin,xmin + (xmax - xmin) / 100.0..xmax]
+    let xs = [xmin,xmin + step..xmax]
     ys <- mapM f xs
     let pts = map p2 $ zip xs ys
     return $ fromVertices pts # lc blue
+  where step = (xmax - xmin) / funcResolution
