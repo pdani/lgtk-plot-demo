@@ -15,6 +15,15 @@ import LGtk.Demos.PlotDemo.ArithParser (parseArith)
 
 type ViewPort = ((Double, Double), (Double, Double))
 
+tr :: ViewPort -> (Double, Double)
+tr ((x1, x2), (y1, y2)) = (-(x1 + x2) / 2.0, -(y1 + y2) / 2.0)
+
+sc :: ViewPort -> (Double, Double)
+sc ((x1, x2), (y1, y2)) = (1.0 / (x1 - x2), 1.0 / (y1 - y2))
+
+defViewPort :: ViewPort
+defViewPort = ((-0.5, 0.5), (-0.5, 0.5))
+
 data PlotState = PlotState
     { _equation :: String
     , _viewport :: ViewPort
@@ -25,9 +34,6 @@ $(makeLenses ''PlotState)
 
 main :: IO ()
 main = runWidget mainWidget
-
-defViewPort :: ViewPort
-defViewPort = ((-0.5, 0.5), (-0.5, 0.5))
 
 mainWidget = notebook
     [ (,) "PDani" $ notebook
@@ -65,11 +71,8 @@ interval ab = (lens fst set1 `lensMap` ab, lens snd set2 `lensMap` ab) where
 
 drawPlot :: PlotState -> (String, Dia Any)
 drawPlot (PlotState eq vp) = maybe ("Parse error", emptyPlot defViewPort) ((,) "" . (transPlot . (flip (<>) $ emptyPlot vp))) res
-  where ((xmin, xmax), (ymin, ymax)) = vp
-        (xr, yr) = (xmax - xmin, ymax - ymin)
-        (xa, ya) = ((xmax + xmin) / 2.0, (ymax + ymin) / 2.0)
-        res = drawFunc vp $ parseFunc eq
-        transPlot = flip (#) $ translate (r2 (-xa / 2.0, -ya / 2.0)) # scaleX (1.0 / xr) # scaleY (1.0 / yr)
+  where res = drawFunc vp $ parseFunc eq
+        transPlot = flip (#) $ translate (r2 $ tr vp) # scaleX ((fst . sc) vp) # scaleY ((snd . sc) vp)
         
 emptyPlot :: ViewPort -> Dia Any
 emptyPlot vp = hrule xsize <> vrule ysize
