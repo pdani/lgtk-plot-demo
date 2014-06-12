@@ -3,7 +3,7 @@ module LGtk.Demos.PlotDemo.Main
     ( main
     ) where
 
-import Control.Monad
+import Control.Applicative
 import Control.Lens hiding ((#))
 
 import LGtk
@@ -30,12 +30,12 @@ mainWidget = notebook
                     [ entry $ equation `lensMap` plotState
                     , label $ readRef errormsg
                     , hcat
-                        [ label $ return "X axis range: "
+                        [ label $ pure "X axis range: "
                         , entryShow xmin
                         , entryShow xmax
                         ]
                     , hcat
-                        [ label $ return "Y axis range: "
+                        [ label $ pure "Y axis range: "
                         , entryShow ymin
                         , entryShow ymax
                         ]

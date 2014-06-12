@@ -20,7 +20,7 @@ tr :: ViewPort -> (Double, Double)
 tr = mapTuple $ (/ 2.0) . negate . uncurry (+)
 
 sc :: ViewPort -> (Double, Double)
-sc = mapTuple $ (1.0 /) . uncurry (-)
+sc = mapTuple $ (1.0 /) . uncurry (flip (-))
 
 defViewPort :: ViewPort
 defViewPort = ((-10, 10), (-10, 10))
@@ -43,7 +43,7 @@ drawPlot :: Double -> PlotState -> (String, Dia ())
 drawPlot lWidth (PlotState eq vp) = maybe ("Parse error", mempty) ((,) "" . (lineSet . transPlot . (flip (<>) $ emptyPlot vp))) res
   where res = drawFunc (fst vp) $ parseFunc eq
         transPlot d = d # translate (r2 $ tr vp) # scaleX ((fst . sc) vp) # scaleY ((snd . sc) vp)
-        lineSet d = d # value () # lw lWidth
+        lineSet d = d # value () # lwL lWidth
         
 emptyPlot :: ViewPort -> Dia Any
 emptyPlot vp = hrule xsize <> vrule ysize

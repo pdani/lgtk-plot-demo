@@ -21,11 +21,11 @@ source-repository head
 executable lgtk-plot-demo
   build-depends:
                     base < 5
-                  , lgtk
+                  , lgtk == 0.9
                   , bytestring
                   , lens
 
-                  , diagrams-lib < 1.2
+                  , diagrams-lib == 1.2.*
                   , containers
                   , attoparsec
                   , attoparsec-expression
