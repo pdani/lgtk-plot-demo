@@ -1,5 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
-module LGtk.Demos.PlotDemo.ArithParser where
+module LGtk.Demos.PlotDemo.ArithParser
+    ( parseFunc
+    ) where
 
 import Data.Attoparsec.ByteString.Char8
 import Control.Applicative
@@ -66,3 +68,7 @@ p t s = skipSpace *> p' t
              ] <* skipSpace
 
 parseArith symTab = parseOnly (p table symTab <* endOfInput) . BS.pack
+
+parseFunc :: String -> Double -> Maybe Double
+parseFunc str x = either (const Nothing) Just $ parseArith symTab str
+  where symTab = [("pi", pi), ("e", exp 1.0), ("x", x)]
