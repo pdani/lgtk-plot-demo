@@ -13,14 +13,17 @@ import LGtk.Demos.PlotDemo.ArithParser (parseFunc)
 
 type ViewPort = ((Double, Double), (Double, Double))
 
+mapTuple :: (a -> b) -> (a, a) -> (b, b)
+mapTuple f (a, b) = (f a, f b)
+
 tr :: ViewPort -> (Double, Double)
-tr ((x1, x2), (y1, y2)) = (-(x1 + x2) / 2.0, -(y1 + y2) / 2.0)
+tr = mapTuple $ (/ 2.0) . negate . uncurry (+)
 
 sc :: ViewPort -> (Double, Double)
-sc ((x1, x2), (y1, y2)) = (1.0 / (x2 - x1), 1.0 / (y2 - y1))
+sc = mapTuple $ (1.0 /) . uncurry (-)
 
 defViewPort :: ViewPort
-defViewPort = ((-0.5, 0.5), (-0.5, 0.5))
+defViewPort = ((-10, 10), (-10, 10))
 
 data PlotState = PlotState
     { _equation :: String
@@ -37,7 +40,7 @@ funcResolution :: Double
 funcResolution = 1000
 
 drawPlot :: Double -> PlotState -> (String, Dia ())
-drawPlot lWidth (PlotState eq vp) = maybe ("Parse error", (lineSet . emptyPlot) defViewPort) ((,) "" . (lineSet . transPlot . (flip (<>) $ emptyPlot vp))) res
+drawPlot lWidth (PlotState eq vp) = maybe ("Parse error", mempty) ((,) "" . (lineSet . transPlot . (flip (<>) $ emptyPlot vp))) res
   where res = drawFunc (fst vp) $ parseFunc eq
         transPlot d = d # translate (r2 $ tr vp) # scaleX ((fst . sc) vp) # scaleY ((snd . sc) vp)
         lineSet d = d # value () # lw lWidth
@@ -45,7 +48,6 @@ drawPlot lWidth (PlotState eq vp) = maybe ("Parse error", (lineSet . emptyPlot) 
 emptyPlot :: ViewPort -> Dia Any
 emptyPlot vp = hrule xsize <> vrule ysize
   where (xsize, ysize) = mapTuple ((* 2.1) . uncurry max . mapTuple abs) vp
-        mapTuple f (a, b) = (f a, f b)
 
 drawFunc :: (Double, Double) -> (Double -> Maybe Double) -> Maybe (Dia Any)
 drawFunc (xmin, xmax) f = do
