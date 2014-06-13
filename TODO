@@ -1,2 +1,3 @@
 * Scrolling inside the plot -> zooming uniformly
 * Dragging the plot -> translateing the diagram
+* Figure out why doesn't it work with GLFW + diagrams
