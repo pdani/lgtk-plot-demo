@@ -10,7 +10,7 @@ git clone https://github.com/divipp/lgtk.git
 cd lgtk
 cabal install -fgtk
 cd ..
-https://github.com/pdani/lgtk-plot-demo.git
+git clone https://github.com/pdani/lgtk-plot-demo.git
 cd lgtk-plot-demo
 cabal install
 lgtk-plot-demo
