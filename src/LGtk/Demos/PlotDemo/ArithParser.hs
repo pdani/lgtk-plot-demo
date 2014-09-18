@@ -80,7 +80,7 @@ p t s = skipSpace *> p' t
 
 parseArith symTab = parseOnly (p table symTab <* endOfInput) . BS.pack
 
--- | 'parseFunc' returns a 'Maybe Double', representing the value of the
+-- | 'parseFunc' returns a 'Maybe' 'Double', representing the value of the
 -- expression, or a parser error. It accepts @expr@, a 'String' parameter
 -- cotaining the string to be parsed, an @x@ value of 'Double', holding
 -- the value of the symbol @x@ potentially used in the expression.
