@@ -1,8 +1,10 @@
-# lgtk-plot-demo
+lgtk-plot-demo
+==============
 
 A small demo app for LGtk plotting simple 2D functions
 
-## Installation
+Installation
+============
 
 This demo works with lgtk==0.9 and only with the GTK backend:
 ```
@@ -15,3 +17,14 @@ cd lgtk-plot-demo
 cabal install
 lgtk-plot-demo
 ```
+
+Documentation
+=============
+
+```
+$ cabal configure
+$ cabal haddock
+```
+
+The generated docs can be found here:
+dist/doc/html/LinkedList/index.html
