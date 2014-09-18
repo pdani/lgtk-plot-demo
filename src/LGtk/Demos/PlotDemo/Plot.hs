@@ -1,4 +1,17 @@
 {-# LANGUAGE TemplateHaskell #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  LGtk.Demos.PlotDemo.Plot
+-- Copyright   :  (c) Daniel Pek 2014
+-- License     :  see LICENSE
+--
+-- Maintainer  :  pekdaniel@gmail.com
+--
+-- This module defines the datatype for describing the state of the
+-- application. Exports the 'drawPlot' function, which creates the plot
+-- using Dia.
+--
+-----------------------------------------------------------------------------
 module LGtk.Demos.PlotDemo.Plot
     ( defPlotState
     , viewport
@@ -33,12 +46,21 @@ data PlotState = PlotState
 
 $(makeLenses ''PlotState)
 
+-- | 'defPlotState' is a default constructor for 'PlotState' describing
+-- the application state. Sets up the default function to plot, and the
+-- default viewpoint settings.
+--
 defPlotState :: PlotState
 defPlotState = PlotState "x ^ 2 - 5" defViewPort
 
 funcResolution :: Double
 funcResolution = 1000
 
+-- | 'drawPlot' plots a Dia, and returns with this Dia together with an
+-- info-string with a potential "Parse error" message. It has two input
+-- parameters: @lWidth@ defines the line width to draw with, and @ps@
+-- contains the application state represented by the PlotState datatype.
+--
 drawPlot :: Double -> PlotState -> (String, Dia ())
 drawPlot lWidth (PlotState eq vp) = maybe ("Parse error", mempty) ((,) "" . (lineSet . transPlot . (flip (<>) $ emptyPlot vp))) res
   where res = drawFunc (fst vp) $ parseFunc eq

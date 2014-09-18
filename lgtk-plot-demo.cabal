@@ -10,9 +10,9 @@ license-file:       LICENSE
 author:             Pék Dániel
 homepage:           https://github.com/pdani/lgtk-plot-demo
 maintainer:         pekdaniel@gmail.com
-cabal-version:      >= 1.8
+cabal-version:      >= 1.10
 build-type:         Simple
-extra-source-files: changelog
+extra-source-files: changelog, README.md
 
 source-repository head
   type:             git

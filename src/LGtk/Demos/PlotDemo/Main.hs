@@ -1,4 +1,18 @@
 {-# LANGUAGE NoMonomorphismRestriction #-}
+
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  LGtk.Demos.PlotDemo.Main
+-- Copyright   :  (c) Daniel Pek 2014
+-- License     :  see LICENSE
+--
+-- Maintainer  :  pekdaniel@gmail.com
+--
+-- Contains the entry point 'main', builds up the user interface, and
+-- establishes data dependencies between GUI elements.
+--
+-----------------------------------------------------------------------------
+
 module LGtk.Demos.PlotDemo.Main
     ( main
     ) where
@@ -12,6 +26,8 @@ import LGtk.Demos.PlotDemo.Plot
 canvasSize = 600
 lWidth = 1 / fromIntegral canvasSize
 
+-- | 'main' runs the mainWidget monad, which builds up the user interface
+--
 main :: IO ()
 main = runWidget mainWidget
 

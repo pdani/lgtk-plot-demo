@@ -1,4 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
+-----------------------------------------------------------------------------
+-- |
+-- Module      :  LGtk.Demos.PlotDemo.ArithParser
+-- Copyright   :  (c) Daniel Pek 2014
+-- License     :  see LICENSE
+--
+-- Maintainer  :  pekdaniel@gmail.com
+--
+-- Simple arithmetic parser using Attoparsec.
+--
+-----------------------------------------------------------------------------
 module LGtk.Demos.PlotDemo.ArithParser
     ( parseFunc
     ) where
@@ -69,6 +80,10 @@ p t s = skipSpace *> p' t
 
 parseArith symTab = parseOnly (p table symTab <* endOfInput) . BS.pack
 
+-- | 'parseFunc' returns a 'Maybe Double', representing the value of the
+-- expression, or a parser error. It accepts @expr@, a 'String' parameter
+-- cotaining the string to be parsed, an @x@ value of 'Double', holding
+-- the value of the symbol @x@ potentially used in the expression.
 parseFunc :: String -> Double -> Maybe Double
 parseFunc str x = either (const Nothing) Just $ parseArith symTab str
   where symTab = [("pi", pi), ("e", exp 1.0), ("x", x)]
